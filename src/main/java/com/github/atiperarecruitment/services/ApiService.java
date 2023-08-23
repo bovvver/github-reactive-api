@@ -17,10 +17,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,8 +36,8 @@ public class ApiService {
 
         checkIfUserExists(username);
 
-        List<RepositoryDTO> repositoryList = getRepositories(username);
-        ResponseDTO response = new ResponseDTO(username, new HashSet<>(repositoryList));
+        Set<RepositoryDTO> repositoryList = getRepositories(username);
+        ResponseDTO response = new ResponseDTO(username, repositoryList);
         return ResponseEntity.ok(response);
     }
 
@@ -46,34 +46,44 @@ public class ApiService {
             throw new WrongHeaderException("'Accept' header format is not acceptable. Please, provide 'application/json' instead.");
     }
 
-    private List<RepositoryDTO> getRepositories(String username) {
-        List<RepositoryDTO> allRepositories = new ArrayList<>();
-        List<RepositoryDTO> fetchedRepositories;
-        int page = 1;
+    private Set<RepositoryDTO> getRepositories(String username) {
+        Set<RepositoryDTO> allRepositories = new HashSet<>();
 
-        do {
-            String repositoriesUrl = String.format("/users/%s/repos?per_page=100&page=%d", username, page);
+        for (int i = 1; ; i++) {
+            AtomicInteger filteredItems = new AtomicInteger(0);
+            String repositoriesUrl = String.format("/users/%s/repos?per_page=100&page=%d", username, i);
             List<GitHubRepositoryDTO> repositories = requestToGitHub(repositoriesUrl, GitHubRepositoryDTO.class);
-
-            fetchedRepositories = repositories.stream()
-                    .filter(repository -> !repository.isFork())
+            Set<RepositoryDTO> fetchedRepositories = repositories.stream()
+                    .filter(repository -> {
+                        if (repository.isFork()) {
+                            filteredItems.getAndIncrement();
+                            return false;
+                        }
+                        return true;
+                    })
                     .flatMap(repository -> getBranches(username, repository))
-                    .toList();
+                    .collect(Collectors.toSet());
 
             allRepositories.addAll(fetchedRepositories);
-            page++;
-        } while (fetchedRepositories.size() == 100);
+            if (fetchedRepositories.size() != (100 - filteredItems.get())) break;
+        }
         return allRepositories;
     }
 
     private Stream<RepositoryDTO> getBranches(String username, GitHubRepositoryDTO repository) {
-        String branchesUrl = String.format("repos/%s/%s/branches", username, repository.getName());
-        List<GitHubBranchDTO> branches = requestToGitHub(branchesUrl, GitHubBranchDTO.class);
+        Set<BranchDTO> branchList = new HashSet<>();
 
-        Set<BranchDTO> branchList = branches.stream()
-                .map(branch -> new BranchDTO(branch.getName(), branch.getCommit().get("sha")))
-                .collect(Collectors.toSet());
+        for (int i = 1; ; i++) {
+            String branchesUrl = String.format("repos/%s/%s/branches?per_page=100&page=%d", username, repository.getName(), i);
+            List<GitHubBranchDTO> branches = requestToGitHub(branchesUrl, GitHubBranchDTO.class);
 
+            Set<BranchDTO> fetchedBranches = branches.stream()
+                    .map(branch -> new BranchDTO(branch.getName(), branch.getCommit().get("sha")))
+                    .collect(Collectors.toSet());
+
+            branchList.addAll(fetchedBranches);
+            if (fetchedBranches.size() != 100) break;
+        }
         return Stream.of(new RepositoryDTO(repository.getName(), branchList));
     }
 
