@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
 @RestController
@@ -16,7 +17,7 @@ public class ApiController {
     private ApiService apiService;
 
     @GetMapping("/repositories")
-    public ResponseEntity<ResponseDTO> getRepositories(@RequestHeader(HttpHeaders.ACCEPT) String acceptHeader, @RequestBody RequestDTO request) throws WrongHeaderException {
+    public Mono<ResponseEntity<ResponseDTO>> getRepositories(@RequestHeader(HttpHeaders.ACCEPT) String acceptHeader, @RequestBody RequestDTO request) throws WrongHeaderException {
         return apiService.getRepositories(acceptHeader, request);
     }
 }
