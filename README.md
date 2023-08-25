@@ -1,6 +1,6 @@
 <div>
-	<div style="text-align: center;"><h1>Atipera recruitment project 🍐</h1></div>
-	<div style="text-align: center;"><p>REST API that gives you basic information about GitHub accounts</p></div>
+	<center><h1>Atipera recruitment project 🍐</h1></center>
+	<center><p>REST API that gives you basic information about GitHub accounts</p></center>
 </div>
 
 ## Introduction
@@ -9,13 +9,14 @@ Thank you for invitation to recruitment process! This project has been created a
 ## Installation
 For this project to work you will need:
 - Your favourite IDE,
-- Web browser / API platform e.g. Postman
+- API platform e.g. Postman
 
 Now you can run project in few simple steps:
 ```bash
 $ git clone https://github.com/MemeeMaster/atipera-recruitment
 $ cd atipera-recruitment
 ```
+Open project with your IDE and run it.
 
 ## Usage / How it works
 This project will give you basic information about GitHub account specified in request body. By sending request you will retrieve:
