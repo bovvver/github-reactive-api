@@ -18,7 +18,9 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,11 +29,23 @@ public class ApiService {
     private WebClient webClient;
 
     public Mono<ResponseEntity<ResponseDTO>> getRepositories(String acceptHeader, RequestDTO requestDTO) {
+        Set<RepositoryDTO> allRepositories = new HashSet<>();
+
         return checkAcceptHeader(acceptHeader)
                 .then(checkIfUserExists(requestDTO.getUsername()))
-                .flatMap(this::fetchRepositories)
-                .map(repositoryList -> new ResponseDTO(requestDTO.getUsername(), repositoryList))
-                .map(ResponseEntity::ok);
+                .flatMapMany(username -> fetchRepositories(username, 1, allRepositories))
+                .collectList()
+                .flatMap(repositoryList -> {
+                    if (repositoryList.isEmpty()) {
+                        ResponseDTO responseDTO = new ResponseDTO(requestDTO.getUsername(), Set.of());
+                        return Mono.just(ResponseEntity.ok(responseDTO));
+                    } else {
+                        Set<RepositoryDTO> repositorySet = repositoryList.get(0);
+
+                        ResponseDTO responseDTO = new ResponseDTO(requestDTO.getUsername(), repositorySet);
+                        return Mono.just(ResponseEntity.ok(responseDTO));
+                    }
+                });
     }
 
     private Mono<Void> checkAcceptHeader(String acceptHeader) {
@@ -60,23 +74,42 @@ public class ApiService {
                 .thenReturn(username);
     }
 
-    private Mono<Set<RepositoryDTO>> fetchRepositories(String username) {
-        String repositoriesUrl = String.format("/users/%s/repos?per_page=100", username);
+    private Flux<Set<RepositoryDTO>> fetchRepositories(String username, int page, Set<RepositoryDTO> allRepositories) {
+        String repositoriesUrl = String.format("/users/%s/repos?per_page=100&page=%d", username, page);
+        AtomicInteger filteredRepos = new AtomicInteger();
 
         return requestToGitHub(repositoriesUrl, GitHubRepositoryDTO.class)
-                .filter(repository -> !repository.isFork())
-                .flatMap(repository -> fetchBranches(username, repository))
-                .collect(Collectors.toSet());
+                .filter(repository -> {
+                    if (!repository.isFork()) return true;
+                    filteredRepos.getAndIncrement();
+                    return false;
+                })
+                .flatMap(repository -> fetchBranches(username, repository, 1, new HashSet<>()))
+                .collect(Collectors.toSet())
+                .flatMapMany(repositorySet -> {
+                    allRepositories.addAll(repositorySet);
+                    if (repositorySet.size() != (100 - filteredRepos.get())) {
+                        return Flux.just(allRepositories);
+                    } else {
+                        return fetchRepositories(username, page + 1, allRepositories);
+                    }
+                });
     }
 
-    private Flux<RepositoryDTO> fetchBranches(String username, GitHubRepositoryDTO repository) {
-        String branchesUrl = String.format("repos/%s/%s/branches?per_page=100", username, repository.getName());
+    private Flux<RepositoryDTO> fetchBranches(String username, GitHubRepositoryDTO repository, int page, Set<BranchDTO> allBranches) {
+        String branchesUrl = String.format("repos/%s/%s/branches?per_page=100&page=%d", username, repository.getName(), page);
 
         return requestToGitHub(branchesUrl, GitHubBranchDTO.class)
                 .map(branch -> new BranchDTO(branch.getName(), branch.getCommit().get("sha")))
                 .collect(Collectors.toSet())
-                .map(branchList -> new RepositoryDTO(repository.getName(), branchList))
-                .flux();
+                .flatMapMany(branchSet -> {
+                    allBranches.addAll(branchSet);
+                    if (branchSet.size() != 100) {
+                        return Flux.just(new RepositoryDTO(repository.getName(), allBranches));
+                    } else {
+                        return fetchBranches(username, repository, page + 1, allBranches);
+                    }
+                });
     }
 
     private <T> Flux<T> requestToGitHub(String url, Class<T> typeReference) {

@@ -1,6 +1,6 @@
-<div>
-	<center><h1>Atipera recruitment project 🍐</h1></center>
-	<center><p>REST API that gives you basic information about GitHub accounts</p></center>
+<div style="text-align: center">
+	<h1>Atipera recruitment project 🍐</h1>
+	<p>REST API that gives you basic information about GitHub accounts</p>
 </div>
 
 ## Introduction
@@ -26,6 +26,8 @@ This project will give you basic information about GitHub account specified in r
 
 **How it works**:
 Simply, when you send a request to the API, it forwards it to the GitHub API to check if the specified user exists. If so, a request is sent to retrieve a list of the user's repositories. This response is filtered to remove fork repositories.
+
+> :warning: **Information:**  Due to pagination of GitHub REST API,it is possible to retrieve only 100 repositories/branches at one time. If user that you request have more than 100 repos/branches in repo, API will send another request.
 
 Requests are then sent for the branches of each of these repositories. It is very easy to exceed GitHub's query limit so for the full experience, I recommend using the app for small/medium accounts.
 
