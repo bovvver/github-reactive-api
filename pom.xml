@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.github</groupId>
-	<artifactId>atiperarecruitment</artifactId>
+	<artifactId>github-reactive-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>atiperarecruitment</name>
 	<description>Recruitment project for Atipera</description>

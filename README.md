@@ -1,10 +1,10 @@
 <div style="text-align: center">
-	<h1>Atipera recruitment project 🍐</h1>
+	<h1>GitHub Reactive Api</h1>
 	<p>REST API that gives you basic information about GitHub accounts</p>
 </div>
 
 ## Introduction
-Thank you for invitation to recruitment process! This project has been created according to the guidelines given in the task description.
+This project served as a way for me to play with reactive programming a bit. Code isn't perfect since im new to WebFlux. Don't rely on it too much 😅
 
 ## Installation
 For this project to work you will need:
@@ -13,8 +13,8 @@ For this project to work you will need:
 
 Now you can run project in few simple steps:
 ```bash
-$ git clone https://github.com/MemeeMaster/atipera-recruitment
-$ cd atipera-recruitment
+$ git clone https://github.com/MemeeMaster/github-reactive-api
+$ cd github-reactive-api
 ```
 Open project with your IDE and run it.
 

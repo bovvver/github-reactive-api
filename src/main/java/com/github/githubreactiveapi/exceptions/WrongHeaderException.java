@@ -1,4 +1,4 @@
-package com.github.atiperarecruitment.exceptions;
+package com.github.githubreactiveapi.exceptions;
 
 public class WrongHeaderException extends RuntimeException {
     public WrongHeaderException(String message) {

@@ -1,10 +1,10 @@
-package com.github.atiperarecruitment;
+package com.github.githubreactiveapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AtiperarecruitmentApplicationTests {
+class GithubReactiveApiApplicationTests {
 
 	@Test
 	void contextLoads() {

@@ -1,11 +1,11 @@
-package com.github.atiperarecruitment;
+package com.github.githubreactiveapi;
 
-import com.github.atiperarecruitment.exceptions.UserNotFoundException;
-import com.github.atiperarecruitment.exceptions.WrongHeaderException;
-import com.github.atiperarecruitment.responsedto.RepositoryDTO;
-import com.github.atiperarecruitment.responsedto.RequestDTO;
-import com.github.atiperarecruitment.responsedto.ResponseDTO;
-import com.github.atiperarecruitment.services.ApiService;
+import com.github.githubreactiveapi.exceptions.UserNotFoundException;
+import com.github.githubreactiveapi.exceptions.WrongHeaderException;
+import com.github.githubreactiveapi.responsedto.RepositoryDTO;
+import com.github.githubreactiveapi.responsedto.RequestDTO;
+import com.github.githubreactiveapi.responsedto.ResponseDTO;
+import com.github.githubreactiveapi.services.ApiService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -74,7 +74,7 @@ public class ApiServiceUnitTests {
         Mockito.when(apiService.getRepositories(acceptHeader, requestDTO)).thenReturn(Mono.just(ResponseEntity.ok(responseDTO)));
 
         StepVerifier.create(apiService.getRepositories(acceptHeader, requestDTO))
-                .expectNextMatches(response -> Objects.requireNonNull(response.getBody()).getOwnerLogin().equals("user") && response.getBody().getRepositoryList().size() == 1)
+                .expectNextMatches(response -> Objects.requireNonNull(response.getBody()).login().equals("user") && response.getBody().repositories().size() == 1)
                 .verifyComplete();
     }
 }

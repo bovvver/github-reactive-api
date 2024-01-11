@@ -1,9 +1,9 @@
-package com.github.atiperarecruitment;
+package com.github.githubreactiveapi;
 
-import com.github.atiperarecruitment.controllers.ApiController;
-import com.github.atiperarecruitment.responsedto.RequestDTO;
-import com.github.atiperarecruitment.responsedto.ResponseDTO;
-import com.github.atiperarecruitment.services.ApiService;
+import com.github.githubreactiveapi.controllers.ApiController;
+import com.github.githubreactiveapi.responsedto.RequestDTO;
+import com.github.githubreactiveapi.responsedto.ResponseDTO;
+import com.github.githubreactiveapi.services.ApiService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+
+import java.util.Set;
 
 @SpringBootTest
 public class ApiControllerUnitTests {
@@ -33,7 +35,7 @@ public class ApiControllerUnitTests {
     @Test
     @DisplayName("Should return OK status")
     public void testGetRepositories() {
-        ResponseEntity<ResponseDTO> responseEntity = new ResponseEntity<>(new ResponseDTO(), HttpStatus.OK);
+        ResponseEntity<ResponseDTO> responseEntity = new ResponseEntity<>(new ResponseDTO("test", Set.of()), HttpStatus.OK);
         Mockito.when(apiService.getRepositories(acceptHeader, request))
                 .thenReturn(Mono.just(responseEntity));
 

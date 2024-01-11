@@ -1,8 +1,8 @@
-package com.github.atiperarecruitment.controllers;
+package com.github.githubreactiveapi.controllers;
 
-import com.github.atiperarecruitment.exceptions.UserNotFoundException;
-import com.github.atiperarecruitment.exceptions.WrongHeaderException;
-import com.github.atiperarecruitment.responsedto.ErrorDTO;
+import com.github.githubreactiveapi.exceptions.UserNotFoundException;
+import com.github.githubreactiveapi.exceptions.WrongHeaderException;
+import com.github.githubreactiveapi.responsedto.ErrorDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;

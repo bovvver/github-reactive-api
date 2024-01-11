@@ -1,14 +1,14 @@
-package com.github.atiperarecruitment.services;
+package com.github.githubreactiveapi.services;
 
-import com.github.atiperarecruitment.exceptions.UserNotFoundException;
-import com.github.atiperarecruitment.exceptions.WrongHeaderException;
-import com.github.atiperarecruitment.githubdto.GitHubBranchDTO;
-import com.github.atiperarecruitment.githubdto.GitHubRepositoryDTO;
-import com.github.atiperarecruitment.githubdto.GitHubUserDTO;
-import com.github.atiperarecruitment.responsedto.BranchDTO;
-import com.github.atiperarecruitment.responsedto.RepositoryDTO;
-import com.github.atiperarecruitment.responsedto.RequestDTO;
-import com.github.atiperarecruitment.responsedto.ResponseDTO;
+import com.github.githubreactiveapi.exceptions.UserNotFoundException;
+import com.github.githubreactiveapi.exceptions.WrongHeaderException;
+import com.github.githubreactiveapi.githubdto.GitHubBranchDTO;
+import com.github.githubreactiveapi.githubdto.GitHubRepositoryDTO;
+import com.github.githubreactiveapi.githubdto.GitHubUserDTO;
+import com.github.githubreactiveapi.responsedto.BranchDTO;
+import com.github.githubreactiveapi.responsedto.RepositoryDTO;
+import com.github.githubreactiveapi.responsedto.RequestDTO;
+import com.github.githubreactiveapi.responsedto.ResponseDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,17 +32,17 @@ public class ApiService {
         Set<RepositoryDTO> allRepositories = new HashSet<>();
 
         return checkAcceptHeader(acceptHeader)
-                .then(checkIfUserExists(requestDTO.getUsername()))
+                .then(checkIfUserExists(requestDTO.username()))
                 .flatMapMany(username -> fetchRepositories(username, 1, allRepositories))
                 .collectList()
                 .flatMap(repositoryList -> {
                     if (repositoryList.isEmpty()) {
-                        ResponseDTO responseDTO = new ResponseDTO(requestDTO.getUsername(), Set.of());
+                        ResponseDTO responseDTO = new ResponseDTO(requestDTO.username(), Set.of());
                         return Mono.just(ResponseEntity.ok(responseDTO));
                     } else {
                         Set<RepositoryDTO> repositorySet = repositoryList.get(0);
 
-                        ResponseDTO responseDTO = new ResponseDTO(requestDTO.getUsername(), repositorySet);
+                        ResponseDTO responseDTO = new ResponseDTO(requestDTO.username(), repositorySet);
                         return Mono.just(ResponseEntity.ok(responseDTO));
                     }
                 });
@@ -97,15 +97,15 @@ public class ApiService {
     }
 
     private Flux<RepositoryDTO> fetchBranches(String username, GitHubRepositoryDTO repository, int page, Set<BranchDTO> allBranches) {
-        String branchesUrl = String.format("repos/%s/%s/branches?per_page=100&page=%d", username, repository.getName(), page);
+        String branchesUrl = String.format("repos/%s/%s/branches?per_page=100&page=%d", username, repository.name(), page);
 
         return requestToGitHub(branchesUrl, GitHubBranchDTO.class)
-                .map(branch -> new BranchDTO(branch.getName(), branch.getCommit().get("sha")))
+                .map(branch -> new BranchDTO(branch.name(), branch.commit().get("sha")))
                 .collect(Collectors.toSet())
                 .flatMapMany(branchSet -> {
                     allBranches.addAll(branchSet);
                     if (branchSet.size() != 100) {
-                        return Flux.just(new RepositoryDTO(repository.getName(), allBranches));
+                        return Flux.just(new RepositoryDTO(repository.name(), allBranches));
                     } else {
                         return fetchBranches(username, repository, page + 1, allBranches);
                     }

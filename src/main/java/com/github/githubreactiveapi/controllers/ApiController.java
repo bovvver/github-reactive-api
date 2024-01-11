@@ -1,9 +1,9 @@
-package com.github.atiperarecruitment.controllers;
+package com.github.githubreactiveapi.controllers;
 
-import com.github.atiperarecruitment.exceptions.WrongHeaderException;
-import com.github.atiperarecruitment.responsedto.RequestDTO;
-import com.github.atiperarecruitment.responsedto.ResponseDTO;
-import com.github.atiperarecruitment.services.ApiService;
+import com.github.githubreactiveapi.exceptions.WrongHeaderException;
+import com.github.githubreactiveapi.responsedto.RequestDTO;
+import com.github.githubreactiveapi.responsedto.ResponseDTO;
+import com.github.githubreactiveapi.services.ApiService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;

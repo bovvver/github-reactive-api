@@ -1,4 +1,4 @@
-package com.github.atiperarecruitment.exceptions;
+package com.github.githubreactiveapi.exceptions;
 
 public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(String message) {
