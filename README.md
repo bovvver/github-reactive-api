@@ -104,7 +104,7 @@ For this kind of exception, you most likely passed the wrong 'Accept' header. Pl
 ```json
 {
 	"status":  400,
-	"error":  "Bad Request",
+	"error":  "Bad Request"
 }
 ```
 You most likely forgot to forward the body to your request. Please check if your body isn't empty.
@@ -113,7 +113,7 @@ You most likely forgot to forward the body to your request. Please check if your
 ```json
 {
 	"status":  403,
-	"error":  "Forbidden",
+	"error":  "Forbidden"
 }
 ```
 This project does not use any validation so the lock comes from the GitHub API. Most likely your IP was blocked due to a very high number of requests.
